@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block tilte %} Order {% endblock %}
+
+{% block css %}
+table .cart_div{ text-align:center; vertical-align: middle;}
+{% endblock %}
+
+{% block body %}
+{% load cart %}
+{% load custom_filter %}
+<div class="container">
+    <div class="px-3 m-4">
+        <p class="display-4 ml-4 pl-4 py-1">Your Orders</p>
+        <table class="table table-sm">
+          <thead class="bg-info">
+            <tr>
+              <th>No</th>
+              <th colspan="2" class="cart_div">Product</th>
+              <th class="cart_div">Price</th>
+              <th class="cart_div">Quantity</th>
+              <th class="cart_div">Total</th>
+              <th class="cart_div">Address</th>
+              <th class="cart_div">Date</th>
+              <th class="cart_div">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% if Placed_Orders %}
+              {% for Placed_Order in Placed_Orders %}
+                  <tr>
+                    <td>{{forloop.counter}}</td>
+                    <td><img src="{{Placed_Order.product.product_image.url}}" class="rounded-circle" alt="cart_product" width=80 height=80></td>
+                    <td>{{Placed_Order.product.product_name|truncatechars:28}}</td>
+                    <td class="cart_div">{{Placed_Order.price|Currency}}</td>
+                    <td class="cart_div">{{Placed_Order.quantity}}</td>
+                    <td class="cart_div">{{Placed_Order.quantity|Multiply:Placed_Order.price|Currency}}</td>
+                    <td class="cart_div text-wrap">{{Placed_Order.address|truncatechars:28}}</td>
+                    <td class="cart_div">{{Placed_Order.ordered_date}}</td>
+                    {% if Placed_Order.status %}
+                      <td class="cart_div"><small class="cart_div badge badge-success">Completed</small></td>
+                    {% else %}
+                      <td class="cart_div"><small class="cart_div badge badge-warning">Pending</small></td>
+                    {% endif %}
+                  </tr>
+              {% endfor %}
+          {% else %}
+              <tr>
+            <td colspan="8" style="text-align:center; font-size:40px;">No Order</td>
+          </tr>
+          {% endif %}
+          </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

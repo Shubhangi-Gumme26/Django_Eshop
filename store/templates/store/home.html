@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block tilte %} Home {% endblock %}
+{% block css %}
+.filter_div, product_div{transition: all .1s linear;}
+.card-body{
+padding:0.15rem 1.25rem;
+}
+.card-title, .card-text{
+margin:0rem;
+}
+.card-img-top{
+height:250px;
+}
+form input{
+display:block;
+width:100%;
+}
+.card-footer { background-color:white; border:1px solid #f2f2f2; margin-top:0.6rem;}
+.card-footer .quantity_div{ padding-top:8px;}
+{% endblock %}
+
+{% block body %}
+{% load cart %}
+{% load custom_filter %}
+<div class="container-fluid my-5">
+    <div class="row">
+        <div class="col-md-3 filter_div mx-auto mb-5">
+            <div class="list-group">
+              <a href="/" class="list-group-item list-group-item-action bg-info">All Products</a>
+              {% for j in Allcaregories %}
+              <a href="?categoryby={{j.id}}" class="list-group-item list-group-item-action">{{ j.category_name }}</a>
+              {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-9 product_div pl-0 mx-auto">
+            <div class="row mx-auto">
+                {% for i in Allproducts %}
+                <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12 mb-5">
+                    <div class="card mx-auto" id={{i.id}}>
+                      <img src="{{i.product_image.url}}" class="card-img-top image-fluid" alt="Product images">
+                      <div class="card-body">
+                        <h6 class="card-title text-truncate"><strong>{{i.product_name|slice:":25"}}</strong></h6>
+                        <p class="card-text">{{i.product_sell_price|Currency}}</p>
+                        <div class="card-footer p-0 no-gutters">
+                            {% if i|Is_In_Cart:request.session.customer_session_cart %}
+                            <div class="row no-gutters">
+                                 <form action="#{{i.id}}" method="post" class="col-3">
+                                    {% csrf_token %}
+                                    <input type="text" name="productwise_id" value="{{i.id}}" hidden>
+                                    <input type="text" name='remove' value='True' hidden>
+                                    <input type="submit" name="add" class="btn btn-info btn-block" value="-">
+                                </form>
+                                 <div class="text-center col quantity_div">{{ i|Cart_Quantity:request.session.customer_session_cart}}</div>
+                                 <form action="#{{i.id}}" method="post" class="col-3">
+                                    {% csrf_token %}
+                                    <input type="text" name="productwise_id" value="{{i.id}}" hidden>
+                                    <input type="submit" name="add" class="btn btn-info btn-block" value="+">
+                                </form>
+                            </div>
+                            {% else %}
+                            <form action="#{{i.id}}" method="post">
+                                {% csrf_token %}
+                                <input type="text" name="productwise_id" value="{{i.id}}" hidden>
+                                <input type="submit" class="btn btn-info btn-block" value="Add to Cart">
+                            </form>
+                            {% endif %}
+                        </div>
+                      </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

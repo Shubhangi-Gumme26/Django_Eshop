@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block tilte %} Cart {% endblock %}
+
+{% block css %}
+table .cart_div{ text-align:center; vertical-align: middle;}
+{% endblock %}
+
+{% block body %}
+{% load cart %}
+{% load custom_filter %}
+<div class="container">
+    <div class="border rounded px-3 pb-5 m-4">
+        <p class="display-4 ml-4 pl-4 py-2">Your Cart</p>
+        <table class="table table-sm">
+          <thead class="bg-info">
+            <tr>
+              <th>No</th>
+              <th colspan="2">Product</th>
+              <th class="cart_div">Price</th>
+              <th class="cart_div">Quantity</th>
+              <th class="cart_div">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+              {% for Cart_Product in Cart_Products %}
+                 <tr>
+                      <td>{{forloop.counter}}</td>
+                      <td><img src="{{Cart_Product.product_image.url}}" class="rounded-circle" alt="cart_product" width=80 height=80></td>
+                      <td>{{Cart_Product.product_name}}</td>
+                      <td class="cart_div">{{Cart_Product.product_sell_price|Currency}}</td>
+                      <td class="cart_div">{{Cart_Product|Cart_Quantity:request.session.customer_session_cart}}</td>
+                      <td class="cart_div">{{Cart_Product|Price_Total:request.session.customer_session_cart|Currency}}</td>
+                    </tr>
+              {% endfor %}
+              </tbody>
+              <tfoot>
+                 <tr>
+                    <td colspan="4"></td>
+                    <td class="cart_div"><strong>Total</strong></td>
+                    <td class="cart_div"><strong>{{Cart_Products|Total_Cart_Price:request.session.customer_session_cart|Currency}}</strong></td>
+                 </tr>
+              </tfoot>
+        </table>
+        {% if Cart_Products %}
+            <div class="mt-5">
+                <a type="button" class="btn btn-info border rounded col-lg-3 float-right" data-toggle="modal" data-target="#Checkoutmodel" href="#">Checkout</a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Address Modal -->
+    <div class="modal fade" id="Checkoutmodel" tabindex="-1" role="dialog" aria-labelledby="Checkoutmodel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title text-center">Checkout Form</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+              <div class="pb-5 mb-2">
+                  <form method="post" action="/store/checkout">
+                  {% csrf_token %}
+                    <div class="form-group">
+                        <label for="shipping_address">Shipping Address</label>
+                        <textarea class="form-control form-control-sm" name="shipping_address" id="shipping_address" rows="3" placeholder="Enter your full address here."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="shipping_phone">Phone</label>
+                        <input type="tel" class="form-control form-control-sm" id="shipping_phone" name="shipping_phone" placeholder="Enter your phone number.">
+                    </div>
+                    <input type="submit" class="col-4 btn btn-info float-right" name="checkout_submit" value="Checkout">
+                  </form>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}
